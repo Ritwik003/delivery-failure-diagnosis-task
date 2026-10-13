@@ -1,0 +1,6 @@
+# Host-side requirements for running this task.
+#
+# pytest is NOT listed here on purpose: it runs inside the task container and
+# is pinned in environment/Dockerfile. Installing it on the host does nothing.
+
+harbor==0.20.0

@@ -1,0 +1,35 @@
+schema_version = "1.4"
+
+[task]
+name = "harbor-eval/delivery-failure-diagnosis"
+version = "1.0.0"
+description = "Read an execution log to separate a retry storm from the misclassification that caused it, and fix the cause rather than the noise."
+keywords = ["diagnosis", "log-analysis", "retry", "root-cause-analysis", "python"]
+
+[metadata]
+evaluation_objective = "Evaluate whether the agent can read an execution log to distinguish the true root cause from a louder, more visible symptom, and fix the cause, when the plausible reading of the log points at the wrong component."
+capability = "Diagnosing a fault from runtime evidence rather than from source code alone"
+difficulty = "medium"
+difficulty_explanation = "Every loud line in the log comes from the retry layer behaving exactly as designed: five attempts, growing backoff, a stack trace naming the retry module. The defect is one quiet DEBUG line that classifies the failure on its transport status while ignoring the permanent code sitting beside it in the preceding line. Fixes aimed at the retry layer can turn the failing test green while the endpoint is still called five times for a delivery that can never succeed."
+category = "software-engineering"
+shortcuts_detected = [
+  "classifying the failure after the budget is spent instead of before the first retry",
+  "raising the retry budget or shortening the backoff",
+  "catching the exhaustion exception and reporting a generic permanent failure",
+  "special-casing the destination or code named in the ticket",
+  "deleting, skipping or weakening the failing repository test",
+  "editing POLICY.md or run.log so the evidence matches the behaviour",
+]
+signals = "attempt_efficiency counts the calls the endpoint actually received, so a fix that produces the right outcome by retrying first and classifying afterwards scores full marks for correctness and zero for efficiency."
+scoring = "per-rubric-criterion partial credit"
+
+[agent]
+timeout_sec = 1800.0
+
+[verifier]
+timeout_sec = 300.0
+
+[environment]
+build_timeout_sec = 900.0
+cpus = 2
+memory_mb = 2048
